@@ -81,14 +81,16 @@ allprojects {
         force(
           // be explicit about the javassist dependency version instead of relying on the transitive version
           libs.javassist,
-          // ensure we have a single version in the classpath despite transitive dependencies
-          libs.scalaLibrary,
-          libs.scalaReflect,
           libs.jacksonAnnotations,
           // be explicit about the Netty dependency version instead of relying on the version set by
           // ZooKeeper (potentially older and containing CVEs)
           libs.nettyHandler,
           libs.nettyTransportNativeEpoll
+        )
+        // ensure we have a single version in the classpath despite transitive dependencies
+        if (scalaVersion.startsWith("2")) force(
+          libs.scalaLibrary,
+          libs.scalaReflect
         )
       }
     }
@@ -803,7 +805,7 @@ project(':core') {
     // `core` is often used in users' tests, define the following dependencies as `api` for backwards compatibility
     // even though the `core` module doesn't expose any public API
     api project(':clients')
-    api libs.scalaLibrary
+    if (scalaVersion.startsWith("2")) api libs.scalaLibrary
 
     implementation project(':server-common')
     implementation project(':metadata')
@@ -820,7 +822,7 @@ project(':core') {
     implementation libs.scalaCollectionCompat
     implementation libs.scalaJava8Compat
     // only needed transitively, but set it explicitly to ensure it has the same version as scala-library
-    implementation libs.scalaReflect
+    if (scalaVersion.startsWith("2")) implementation libs.scalaReflect
     implementation libs.scalaLogging
     implementation libs.slf4jApi
     implementation(libs.zookeeper) {
@@ -1854,7 +1856,7 @@ project(':streams:streams-scala') {
   dependencies {
     api project(':streams')
 
-    api libs.scalaLibrary
+    if (scalaVersion.startsWith("2")) api libs.scalaLibrary
     api libs.scalaCollectionCompat
 
     testImplementation project(':core')
@@ -2182,7 +2184,7 @@ project(':jmh-benchmarks') {
     implementation libs.metrics
     implementation libs.mockitoCore
     implementation libs.slf4jlog4j
-    implementation libs.scalaLibrary
+    if (scalaVersion.startsWith("2")) implementation libs.scalaLibrary
     implementation libs.scalaJava8Compat
   }
 
